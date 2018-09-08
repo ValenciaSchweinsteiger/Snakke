@@ -1,0 +1,15 @@
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\bin\Debug\SnakeWPF.exe.config
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\bin\Debug\SnakeWPF.exe
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\bin\Debug\SnakeWPF.pdb
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF.csprojAssemblyReference.cache
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\MainWindow.g.cs
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\App.g.cs
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF_MarkupCompile.cache
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF_MarkupCompile.lref
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\MainWindow.baml
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF.g.resources
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF.Properties.Resources.resources
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF.csproj.GenerateResource.cache
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF.csproj.CoreCompileInputs.cache
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF.exe
+D:\VS2017\Projects\SnakeWPF\SnakeWPF\obj\Debug\SnakeWPF.pdb
