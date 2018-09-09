@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SnakeWPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="690" Width="985">
-    <Grid x:Name="g1">
+    <Grid x:Name="g1" KeyDown="g1_KeyDown">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.3*"/>
             <ColumnDefinition Width="3*"/>
@@ -22,14 +22,14 @@
             <RowDefinition Height="40*"/>
             <RowDefinition Height="0,1*"/>
         </Grid.RowDefinitions>
-        <Canvas x:Name="canv" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="5" Background="WhiteSmoke">
+        <Canvas x:Name="canvas" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="5" Background="WhiteSmoke" KeyDown="canvas_KeyDown">
             <Canvas Height="550" Width="950"/>
-            <Ellipse Fill="#FF35353C" Height="20" Stroke="Black" Width="20" Canvas.Left="0" Canvas.Top="0"/>
+            <Border x:Name="Borders" BorderThickness="2" BorderBrush="Black" Height="540" Width="931" />
         </Canvas>
-        <Button x:Name="NewButton" Content="New" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="100" Height="40" FontSize="16" Click="NewButton_Click"/>
-        <Button x:Name="PauseButton" Content="Pause" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="100" Height="40" FontSize="16" Click="PauseButton_Click"/>
-        <RadioButton x:Name="Level1" Content="Without Borders" Grid.Column="3" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <RadioButton x:Name="Level2" Content="With Borders" Grid.Column="3" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Button x:Name="NewButton" Content="New" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" Height="40" FontSize="16" Click="NewButton_Click"/>
+        <Button x:Name="PauseButton" Content="Pause" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" Height="40" FontSize="16" Click="PauseButton_Click"/>
+        <RadioButton x:Name="Level1" Content="Without Borders" Grid.Column="3" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" FontSize="16" TabIndex="0" Click="Level1_Click"/>
+        <RadioButton x:Name="Level2" Content="With Borders" Grid.Column="3" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" FontSize="16" Click="Level2_Click"/>
         <Label x:Name="LevelLabel" Content="Level" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"/>
         <Label x:Name="Level" Content="1" Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="18"/>
         <Label x:Name="ScorLabel" Content="Score" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"/>

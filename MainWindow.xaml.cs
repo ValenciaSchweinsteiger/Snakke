@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace SnakeWPF
 {
@@ -20,138 +21,126 @@ namespace SnakeWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Random rnd = new Random();
+        private Snake snake = new Snake();
+        private int NewBlockAppearsInSec;
+        private int InitTimerIntervalValue = 1000;
+        private int LevelValue = 1;
+        private int ScoreValue;
+        private DispatcherTimer timer = new DispatcherTimer();
+        
         public MainWindow()
         {
             InitializeComponent();
+            timer.Tick += timer_Tick;
+            timer.Interval = TimeSpan.FromMilliseconds(InitTimerIntervalValue);
+            timer.Start();
         }
-        
+        private void timer_Tick(object sender, EventArgs e)
+        {
+
+            if (!snake.IsBlockCatched())
+                snake.CatchBlock();
+            if (snake.IsBlockCatched())
+            {
+                ScoreValue += LevelValue * 10;
+                if ((snake.body.Count() % 5) == 0)
+                {
+                    if (this.timer.Interval.Milliseconds > 50)
+                        this.timer.Interval.Subtract(TimeSpan.FromMilliseconds(50));
+                    ++LevelValue;
+                }
+                Score.Content = $"{Score}";
+                Level.Content = $"{Level}";
+               
+                snake.GenerateNewBlock();
+            }
+            snake.PlayMode = GetPlayMode();
+            snake.lastScore = ScoreValue;
+            snake.Move();
+            if (snake.Loosed)
+            {
+                this.timer.Stop();
+            }
+            Draw();
+
+        }
+        public int GetPlayMode() => (Level1.TabIndex == 0 ? 2 : 1);
+
         private void NewButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Кнопка нажата");
+            snake = new Snake();
+            LevelValue = 1;
+            ScoreValue = 0;
+            timer.Interval = TimeSpan.FromMilliseconds(InitTimerIntervalValue);
+            timer.Start();
         }
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-    }
-
-    public enum Direction
-    {
-        Up = 1,
-        Down,
-        Left,
-        Right
-    }
-
-    class Snake
-    {
-        public Direction direction;
-        private Point element = new Point();
-        public Point NewBlock;
-        private Color color;
-        public List<Point> body;
-        private Random rnd = new Random();
-        private bool BlockCatched;
-        public int lastScore;
-        public int PlayMode;
-        public bool Loosed;
-
-        public Snake()
-        {
-            BlockCatched = false;
-            body = new List<Point>();
-            NewBlock = new Point();
-            direction = Direction.Right;
-            color = Color.DeepPink;
-            element.Y = 300;
-            PlayMode = 1;
-            Loosed = false;
-            for (int i = 0; i < 3; ++i)
-            {
-                element.X = 60 - i * 20;
-                body.Add(element);
-            }
-            GenerateNewBlock();
-        }
-
-        public int GetSize() => body.Count();
-        public Color GetColor() => color;
-
-        public void Move(Point p = new Point())
-        {
-            if (Loosed)
+            if (snake.Loosed)
                 return;
-            if ((p.X == 0) && (p.Y == 0))
+            Button button = (Button)sender;
+            if (PauseButton.Content == "Pause")
             {
-                element = body[0];
-                switch (direction)
+                PauseButton.Content = "Continue";
+                timer.Stop();
+            }
+            else if (PauseButton.Content == "Continue")
+            {
+                PauseButton.Content = "Pause";
+                timer.Start();
+            }
+        }
+            private void canvas_KeyDown(object sender, KeyEventArgs e)
+            {
+                switch (e.Key)
                 {
-                    case Direction.Down:
-                        element.Y += 20;
-                        break;
-                    case Direction.Left:
-                        element.X -= 20;
-                        break;
-                    case Direction.Right:
-                        element.X += 20;
-                        break;
-                    case Direction.Up:
-                        element.Y -= 20;
-                        break;
-                }
-
-                if (element.Y > 580)
-                {
-                    if (PlayMode == 1)
-                        element.Y %= 580;
-                    else
-                        GameOver(lastScore);
-                }
-                if (element.Y < 0)
-                {
-                    if (PlayMode == 1)
-                        element.Y += 590;
-                    else
-                        GameOver(lastScore);
-                }
-
-                if (element.X > 940)
-                {
-                    if (PlayMode == 1)
-                        element.X %= 940;
-                    else
-                        GameOver(lastScore);
-                }
-
-                if (element.X < 0)
-                {
-                    if (PlayMode == 1)
-                        element.X += 940;
-                    else
-                        GameOver(lastScore);
-                }
-                if (body.Any(x => x.Equals(element)))
-                    GameOver(lastScore);
-                if (Loosed)
+                case Key.W:
+                    if (snake.direction != Direction.Down)
+                        snake.direction = Direction.Up;
                     return;
-                body.RemoveAt(body.Count - 1);
+                case Key.S:
+                    if (snake.direction != Direction.Up)
+                        snake.direction = Direction.Down;
+                    return;
+                case Key.A:
+                    if (snake.direction != Direction.Right)
+                        snake.direction = Direction.Left;
+                    return;
+                case Key.D:
+                    if (snake.direction != Direction.Left)
+                        snake.direction = Direction.Right;
+                    return;
             }
-            else
-            {
-                element = p;
-            }
-            body.Insert(0, element);
         }
         public void Draw()
         {
-           for(int i = 0; i < body.Count; i++)
+            canvas.Children.Clear();
+            for (int i = 0; i < snake.body.Count; i++)
             {
                 Ellipse ell = new Ellipse();
                 ell.Width = 20;
                 ell.Height = 20;
-                //ell.Children.Add(myButton);
+                ell.Fill = new SolidColorBrush(Colors.DarkGray);
+                ell.Uid = $"{i}";
+                Canvas.SetLeft(ell, snake.body[i].X);
+                Canvas.SetTop(ell, snake.body[i].Y);
+                canvas.Children.Add(ell);
             }
-            
+            if (!snake.BlockCatched)
+            {
+                Ellipse ell = new Ellipse();
+                ell.Width = 20;
+                ell.Height = 20;
+                ell.Fill = new SolidColorBrush(Colors.DarkGray);
+                Canvas.SetLeft(ell, snake.NewBlock.X);
+                Canvas.SetTop(ell, snake.NewBlock.Y);
+                canvas.Children.Add(ell);
+            }
+            if (snake.PlayMode == 2)
+                Borders.BorderThickness = new Thickness(2, 2, 2, 2);
+            else
+                Borders.BorderThickness = new Thickness(0, 0, 0, 0); ;
             
             /* Bitmap bmp = new Bitmap(panel.Width, panel.Height);
             panel.BackgroundImage = (Image)bmp;
@@ -180,9 +169,147 @@ namespace SnakeWPF
             g.Dispose();*/
         }
 
+        private void g1_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.W:
+                    if (snake.direction != Direction.Down)
+                        snake.direction = Direction.Up;
+                    return;
+                case Key.S:
+                    if (snake.direction != Direction.Up)
+                        snake.direction = Direction.Down;
+                    return;
+                case Key.A:
+                    if (snake.direction != Direction.Right)
+                        snake.direction = Direction.Left;
+                    return;
+                case Key.D:
+                    if (snake.direction != Direction.Left)
+                        snake.direction = Direction.Right;
+                    return;
+            }
+        }
+
+        private void Level1_Click(object sender, RoutedEventArgs e)
+        {
+            snake.PlayMode = 1;
+        }
+
+        private void Level2_Click(object sender, RoutedEventArgs e)
+        {
+            snake.PlayMode = 2;
+        }
+    }
+
+    public enum Direction
+    {
+        Up = 1,
+        Down,
+        Left,
+        Right
+    }
+
+    class Snake
+    {
+        public Direction direction;
+        private Point element = new Point();
+        public Point NewBlock;
+        public List<Point> body;
+        private Random rnd = new Random();
+        public bool BlockCatched;
+        public int lastScore;
+        public int PlayMode;
+        public bool Loosed;
+
+        public Snake()
+        {
+            BlockCatched = false;
+            body = new List<Point>();
+            NewBlock = new Point();
+            direction = Direction.Right;
+            element.Y = 275;
+            PlayMode = 1;
+            Loosed = false;
+            for (int i = 0; i < 3; ++i)
+            {
+                element.X = 60 - i * 20;
+                body.Add(element);
+            }
+            GenerateNewBlock();
+        }
+
+        public void Move(Point p = new Point())
+        {
+            if (Loosed)
+                return;
+            if ((p.X == 0) && (p.Y == 0))
+            {
+                element = body[0];
+                switch (direction)
+                {
+                    case Direction.Down:
+                        element.Y += 20;
+                        break;
+                    case Direction.Left:
+                        element.X -= 20;
+                        break;
+                    case Direction.Right:
+                        element.X += 20;
+                        break;
+                    case Direction.Up:
+                        element.Y -= 20;
+                        break;
+                }
+
+                if (element.Y > 580)
+                {
+                    if (PlayMode == 1)
+                        element.Y %= 550;
+                    else
+                        GameOver(lastScore);
+                }
+                if (element.Y < 0)
+                {
+                    if (PlayMode == 1)
+                        element.Y += 550;
+                    else
+                        GameOver(lastScore);
+                }
+
+                if (element.X > 940)
+                {
+                    if (PlayMode == 1)
+                        element.X %= 950;
+                    else
+                        GameOver(lastScore);
+                }
+
+                if (element.X < 0)
+                {
+                    if (PlayMode == 1)
+                        element.X += 950;
+                    else
+                        GameOver(lastScore);
+                }
+                if (body.Any(x => x.Equals(element)))
+                    GameOver(lastScore);
+                if (Loosed)
+                    return;
+                body.RemoveAt(body.Count - 1);
+            }
+            else
+            {
+                element = p;
+            }
+            body.Insert(0, element);
+        }
+        
+
         public void GenerateNewBlock()
         {
-            NewBlock = new Point(rnd.Next(1, 47) * 20, rnd.Next(1, 29) * 20);
+            NewBlock = new Point(rnd.Next(1, 47) * 20, rnd.Next(1, 27) * 20);
             BlockCatched = false;
         }
 
@@ -226,4 +353,6 @@ namespace SnakeWPF
             };
         }
     }
-}
+
+    }
+    
